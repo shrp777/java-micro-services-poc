@@ -19,19 +19,55 @@ services:
       - shrp
 
   tasks-service:
-    build: ./tasks
+    build: ./tasks-service
     env_file:
-      - ./tasks/.env
+      - ./tasks-service/.env
     depends_on:
       tasks-db:
         condition: service_healthy
     develop:
       watch:
         - action: rebuild
-          path: ./tasks
+          path: ./tasks-service
           target: /app
     ports:
       - 7080:8080
+    networks:
+      - shrp
+
+  auth-db:
+    image: postgres
+    user: postgres
+    secrets:
+      - auth-db-password
+    env_file:
+      - ./auth-db/.env
+    # volumes:
+    #   - ./auth-db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shrp
+
+  auth-service:
+    build: ./auth-service
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      tasks-db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./auth-service
+          target: /app
+    ports:
+      - 6080:8080
     networks:
       - shrp
 
