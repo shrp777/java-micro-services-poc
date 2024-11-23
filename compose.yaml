@@ -1,0 +1,56 @@
+services:
+  tasks-db:
+    image: postgres
+    user: postgres
+    secrets:
+      - tasks-db-password
+    env_file:
+      - ./tasks-db/.env
+    # volumes:
+    #   - ./tasks-db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shrp
+
+  tasks-service:
+    build: ./tasks
+    env_file:
+      - ./tasks/.env
+    depends_on:
+      tasks-db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./tasks
+          target: /app
+    ports:
+      - 7080:8080
+    networks:
+      - shrp
+
+  adminer:
+    image: adminer
+    environment:
+      - ADMINER_DEFAULT_SERVER=tasks-db
+    ports:
+      - 8080:8080
+    networks:
+      - shrp
+
+volumes:
+  tasks-db-data:
+
+secrets:
+  tasks-db-password:
+    file: ./secrets/tasks-db-password
+
+networks:
+  shrp:
+    driver: bridge
