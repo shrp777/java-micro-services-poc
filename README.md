@@ -1,12 +1,13 @@
 # Architecture Micro Services modèle - Java (Spring Boot) + Docker (PoC)
 
-🚨🚨🚨 Preuve de concept (work in progress) 🚨🚨🚨
+## Avertissement
+
+🚨🚨🚨 Ce projet est une __Preuve de concept__ fourni à des fins pédagogiques. Le code doit être optimisé avant d'être employé en production. 🚨🚨🚨
 
 TODO:
 
 - le service auth n'est pas implémenté (signin, signup, signout, verify token...).
-- le service gateway n'est pas implémenté.
-- les services et les BDD sont accessibles depuis l'extérieur du réseau : ils ne devraient pas l'être. Seul le service gateway devrait être accessible depuis l'extérieur.
+- le service gateway est simpliste. Il peut être amélioré.
 
 ## Instructions pour l'installation (avant le lancement des services Docker)
 
@@ -14,11 +15,43 @@ TODO:
 
 - ./secrets/tasks-db-password
 - ./gateway-service/.env
-- ./auth-service/.env
-- ./auth-db/.env
 - ./tasks-service/.env
 - ./tasks-db/.env
 - ./rabbitmq/.env
+
+## Génération des services Java avec Spring Initializr
+
+Les services Java ont été initialisés à l'aide de Spring Initializr <https://start.spring.io/> avec la configuration suivante :
+
+- Project : Maven
+- Language : Java
+- Spring Boot : 3.4.0
+- Project Meatadat :
+  - Group : dev.shrp
+  - Artifact : nom-du-service
+  - Name : nom-du-service
+  - Description : Micro Service nom-du-service
+  - Package name : dev.shrp.nom-du-service
+  - Packaging : Jar
+  - Java : 17
+  - Dependencies :
+    - Spring Web
+    - Spring Data JPA (si le service est connecté à une base de données)
+    - PostgreSQL Driver (si la base de données est de type PostgreSQL)
+
+- Pour chaque service Java :
+  - ajouter un fichier Dockerfile et les variables d'environnement utiles avec un fichier .env à la racine du dossier du service, à référencer dans le fichier compose.yaml
+  - personnaliser le fichier ./src/main/resources/application.properties pour accéder aux variables d'environnement  
+
+  ```properties
+    spring.application.name=gateway
+
+    tasks_service=${TASKS_SERVICE}
+  ```
+
+- [Configuration Spring Initializr pour le service Gateway](https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.4.0&packaging=jar&jvmVersion=17&groupId=dev.shrp&artifactId=gateway&name=gateway&description=Service%20gateway&packageName=dev.shrp.gateway&dependencies=cloud-gateway-reactive,cloud-resilience4j,cloud-contract-stub-runner)
+
+- Tutoriel pour le service Gateway : [Building a Gateway](https://spring.io/guides/gs/gateway)
 
 ## Lancement des services Docker
 

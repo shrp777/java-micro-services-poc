@@ -6,8 +6,6 @@ services:
       - tasks-db-password
     env_file:
       - ./tasks-db/.env
-    # volumes:
-    #   - ./tasks-db/sql:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
     healthcheck:
@@ -30,44 +28,26 @@ services:
         - action: rebuild
           path: ./tasks-service
           target: /app
-    ports:
-      - 7080:8080
+    #décommenter ports pour exposer le service sur la machine locale (et commenter expose)
+    # ports:
+    #   - 7080:8080
+    #décommenter exposer pour ne pas exposer le service sur la machine locale (et commenter ports)
+    expose:
+      - 8080
     networks:
       - shrp
 
-  auth-db:
-    image: postgres
-    user: postgres
-    secrets:
-      - auth-db-password
+  gateway-service:
+    build: ./gateway-service
     env_file:
-      - ./auth-db/.env
-    # volumes:
-    #   - ./auth-db/sql:/docker-entrypoint-initdb.d
-    ports:
-      - 5433:5432
-    healthcheck:
-      test: ["CMD", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - shrp
-
-  auth-service:
-    build: ./auth-service
-    env_file:
-      - ./auth-service/.env
-    depends_on:
-      tasks-db:
-        condition: service_healthy
+      - ./gateway-service/.env
     develop:
       watch:
         - action: rebuild
-          path: ./auth-service
+          path: ./gateway-service
           target: /app
     ports:
-      - 6080:8080
+      - 8888:8080
     networks:
       - shrp
 
@@ -80,12 +60,15 @@ services:
     networks:
       - shrp
 
-volumes:
-  tasks-db-data:
+# volumes:
+#   tasks-db-data:
+#   auth-db-data:
 
 secrets:
   tasks-db-password:
-    file: ./secrets/tasks-db-password
+    file: ./secrets/tasks-db-password.txt
+  auth-db-password:
+    file: ./secrets/auth-db-password.txt
 
 networks:
   shrp:

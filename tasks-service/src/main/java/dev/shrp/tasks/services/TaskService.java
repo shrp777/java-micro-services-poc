@@ -26,4 +26,11 @@ public class TaskService {
     public Task createTask(Task task) {
         return taskRepository.save(task);
     }
+
+    public void seed() {
+        var task = new Task();
+        task.content = "faire du sport";
+        task.user_id = "f928c455-d2f3-4e30-bf58-178ae041e8c2";
+        taskRepository.save(task);
+    }
 }
