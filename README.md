@@ -85,6 +85,20 @@ docker compose up --build --watch
 docker compose down
 ```
 
+## Test de l'API avec Curl
+
+- curl --request GET \
+  --url <http://localhost:8888/tasks>
+- curl --request GET \
+  --url <http://localhost:8888/tasks/1>
+- curl --request POST \
+  --url <http://localhost:8888/tasks> \
+  --header 'content-type: application/json' \
+  --data '{
+  "user_id":"f928c455-d2f3-4e30-bf58-178ae041e8c2",
+  "content":"Faire du sport"
+}'
+
 --
 
 !["Logotype Shrp"](https://sherpa.one/images/sherpa-logotype.png)
