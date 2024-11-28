@@ -1,5 +1,6 @@
 package dev.shrp.gateway;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -60,13 +61,21 @@ public class GatewayApplication {
 @ConfigurationProperties
 class UriConfiguration {
 
-    private String httpbin = "http://tasks-service:8080";
+    @Value("${tasks_service}")
+    private String tasks_service;
 
-    public String getHttpbin() {
+    //private String httpbin = "http://" + System.getenv("tasks_service") + ":8080";
+    //
+    // OU
+    //
+    private String httpbin = "http://" + tasks_service + ":8080";
+
+     public String getHttpbin() {
         return httpbin;
     }
 
     public void setHttpbin(String httpbin) {
+        //test
         this.httpbin = httpbin;
     }
 }
